@@ -1,0 +1,26 @@
+---
+- name: es conf
+  sudo: no
+  template: >
+    src=./templates/elasticsearch.yml
+    dest=~/{{ es_version }}/config/
+
+- template: >
+    src=./templates/elasticsearch
+    dest=/etc/init.d/elasticsearch
+    owner=root group=root mode=0755
+
+- name: Add Plugin elasticsearch-head
+  sudo: no
+  command: ~/{{ es_version }}/bin/plugin -install mobz/elasticsearch-head creates=~/{{ es_version }}/plugins/head
+
+- name: Add Plugin analysis-kuromoji
+  sudo: no
+  command: ~/{{ es_version }}/bin/plugin -install elasticsearch/elasticsearch-analysis-kuromoji/{{ kuromoji_version }} creates=~/{{ es_version }}/plugins/analysis-kuromoji
+
+- name: es stop
+  service: name=elasticsearch state=stopped
+
+- name: es start
+  service: name=elasticsearch state=started
+

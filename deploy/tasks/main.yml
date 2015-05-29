@@ -1,0 +1,8 @@
+---
+
+- name: expand elasticsearch
+  unarchive: >
+      src=./lib/{{ es_version }}.zip
+      dest=/home/vagrant/
+      creates=/home/vagrant/{{ es_version }}/bin/elasticsearch
+      owner=vagrant group=vagrant mode=0755

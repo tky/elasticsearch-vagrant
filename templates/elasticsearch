@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# chkconfig: - 90 20
+#
+#
+ES_HOME=/home/vagrant/{{ es_version }}
+BIN=$ES_HOME/bin/elasticsearch
+JAVA_HOME=/usr/bin/java
+ES_HEAP_SIZE=1g
+ES_USE_GC_LOGGING=1
+PID_FILE=$ES_HOME/elasticsearch.pid
+USER=vagrant
+PORT=9200
+HOST=$(hostname -s)
+
+bind_pid(){
+    port=$1
+    pid=$(/usr/sbin/lsof -P -i TCP:$port | grep ":$port (LISTEN)" | awk '{print $2}')
+    echo $pid
+}
+
+case "$1" in
+    start)
+        su -c "JAVA_HOME=$JAVA_HOME ES_HEAP_SIZE=$ES_HEAP_SIZE ES_USE_GC_LOGGING=$ES_USE_GC_LOGGING $BIN -d -p $PID_FILE" $USER
+    ;;
+    stop)
+        pid=`bind_pid $PORT`
+        if [ "$pid" != "" ] ; then
+            kill $pid
+        else
+            echo "ElasticSearch is not running."
+        fi
+    ;;
+    status)
+        pid=`bind_pid $PORT`
+        if [ "$pid" != "" ] ; then
+            echo "ElasticSearch running (pid: $pid)"
+        else
+            echo "ElasticSearch is not running."
+        fi
+    ;;
+    jstack)
+        pid=`bind_pid $PORT`
+        if [ "x" = "x$pid" ] ; then
+            echo "ElasticSearch is not running"
+            exit 1
+        fi
+        jstack_file=/apps/tmp/jstack.elasticsearch.$(date +%Y%m%d%H%M%S)
+        su $USER -c "$JAVA_HOME/bin/jstack $pid > $jstack_file"
+        echo "check $jstack_file"
+    ;;
+    *)
+        echo "$(basename $0) {start|stop|status|jstack}"
+        exit 1
+    ;;
+esac

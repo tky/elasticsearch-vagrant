@@ -1,0 +1,19 @@
+---
+
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    es_version: elasticsearch-1.1.1
+  tasks:
+    - name: download es
+      get_url: url=https://download.elastic.co/elasticsearch/elasticsearch/{{ es_version }}.zip dest=./lib/{{ es_version }}.zip
+
+- hosts: servers
+  user: vagrant
+  sudo: yes
+  vars:
+    es_version: elasticsearch-1.1.1
+    kuromoji_version: 2.1.0
+  roles:
+    - sudoers
+    - elasticsearch

@@ -1,0 +1,27 @@
+---
+
+- name: snapshot settings
+  shell: >-
+    curl -XPUT 'http://{{ host_address }}:9200/_snapshot/conference' -d '{
+      type: "fs",
+      "settings": {
+        "location": "/home/vagrant/backup/conference",
+        "compress": true
+        }
+      }'
+
+- name: delete old snapshot
+  shell: >-
+    curl -XDELETE "{{ host_address}}:9200/_snapshot/conference/snapshot_1"
+
+- name: make snapshot
+  shell: >-
+    curl -XPUT "{{ host_address}}:9200/_snapshot/conference/snapshot_1?wait_for_completion=true"
+
+- name: stop allocation
+  shell: >-
+    curl -XPUT {{ host_address }}:9200/_cluster/settings -d '{
+      "transient" : {
+        "cluster.routing.allocation.enable" : "none"
+      }
+    }'

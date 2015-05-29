@@ -1,0 +1,31 @@
+---
+
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    es_version: elasticsearch-1.5.2
+  tasks:
+    - name: download es
+      get_url: url=https://download.elastic.co/elasticsearch/elasticsearch/{{ es_version }}.zip dest=./lib/{{ es_version }}.zip
+
+- hosts: web1
+  user: vagrant
+  sudo: yes
+  vars:
+    es_version: elasticsearch-1.5.2
+    host_address: 192.168.33.11
+  roles:
+    - snapshot
+
+- hosts: servers
+  user: vagrant
+  sudo: yes
+  vars:
+    es_version: elasticsearch-1.5.2
+    kuromoji_version: 2.5.0
+    host_address: 192.168.33.11
+  roles:
+    - deploy
+    - stop 
+    - elasticsearch
+    #- after 起動する前にapiを実行するので失敗してしまう。。

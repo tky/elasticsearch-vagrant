@@ -1,0 +1,24 @@
+---
+- name: install library
+  yum: name={{item}} state=installed
+  with_items:
+  - libselinux-python
+  - unzip
+  - java-1.7.0-openjdk
+  - lsof
+  - wget
+
+- name : create data directory
+  sudo: no
+  command: mkdir ~/data creates=~/data
+
+- name: expand elasticsearch
+  unarchive: >
+      src=./lib/{{ es_version }}.zip
+      dest=/home/vagrant/
+      creates=/home/vagrant/{{ es_version }}/bin/elasticsearch
+      owner=vagrant group=vagrant mode=0755
+
+- name: stop iptables
+  service: name=iptables state=stopped
+  service: name=ip6tables state=stopped

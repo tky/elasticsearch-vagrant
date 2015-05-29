@@ -1,0 +1,9 @@
+cluster.name: cluster
+
+node.name: {{ inventory_hostname }}
+
+network.publish_host: _eth1:ipv4_
+
+http.max_content_length: 500mb
+
+path.data: /home/vagrant/data

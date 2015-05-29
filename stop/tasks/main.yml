@@ -1,0 +1,20 @@
+---
+
+- name: stop allocation
+  shell: >-
+    curl -XPUT {{ host_address }}:9200/_cluster/settings -d '{
+      "transient" : {
+        "cluster.routing.allocation.enable" : "none"
+      }
+    }'
+
+- name: stop node
+  shell: >-
+    curl -XPOST 'http://{{ host_address }}:9200/_cluster/nodes/_local/_shutdown'
+
+- name: expand elasticsearch
+  unarchive: >
+      src=./{{ es_version }}.zip
+      dest=/home/vagrant/
+      creates=/home/vagrant/{{ es_version }}/bin/elasticsearch
+      owner=vagrant group=vagrant mode=0755
