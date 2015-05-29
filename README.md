@@ -52,7 +52,7 @@ ansible-playbook migrate.yml
 ```
 detail
 
-- make snapshotの
+- make snapshot
 - sotp allocation
 - stop node
 - deploy new elasticsearch 
